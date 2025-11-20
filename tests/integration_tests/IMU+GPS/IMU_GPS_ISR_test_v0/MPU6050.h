@@ -24,12 +24,12 @@
 #define DLPF_260HZ        0x00  // 260Hz bandwidth
 
 // Calibration offsets
-#define ACCEL_X_OFFSET  850
-#define ACCEL_Y_OFFSET  27
-#define ACCEL_Z_OFFSET  -177
-#define GYRO_X_OFFSET   -47
-#define GYRO_Y_OFFSET   -10
-#define GYRO_Z_OFFSET   23
+#define ACCEL_X_OFFSET  327
+#define ACCEL_Y_OFFSET  54
+#define ACCEL_Z_OFFSET  -590
+#define GYRO_X_OFFSET   -7
+#define GYRO_Y_OFFSET   15
+#define GYRO_Z_OFFSET   -62
 
 // Scale factors
 #define ACCEL_SCALE  4096.0f   // LSB/g for ±8g
