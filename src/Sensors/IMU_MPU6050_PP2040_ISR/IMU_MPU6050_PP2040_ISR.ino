@@ -18,9 +18,13 @@ void loop() {
     getAllIMUData(&roll, &pitch, &yaw, &rate_x, &rate_y, &rate_z);
     
     // Use data
-    Serial.print("Roll: "); Serial.print(roll);
-    Serial.print(" Pitch: "); Serial.print(pitch);
-    Serial.print(" Yaw: "); Serial.println(yaw);
+    //Serial.print("Roll: "); Serial.print(roll);
+    //Serial.print(" Pitch: "); Serial.print(pitch);
+    //Serial.print(" Yaw: "); Serial.println(yaw);
+
+    Serial.print("rate_x: "); Serial.print(rate_x*1000);
+    Serial.print(" rate_y: "); Serial.print(rate_y*1000);
+    Serial.print(" rate_z: "); Serial.println(rate_z*1000);
     
     delay(10);
 }
