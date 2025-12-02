@@ -19,6 +19,27 @@ uint16_t calculateValidity(const uint8_t* frame) {
     return sum;
 }
 
+FrameType identifyFrame(const uint8_t* frame, size_t size) {
+    if(size != FRAME_SIZE) return FRAME_ERROR;
+    
+    uint16_t validity = (frame[0] << 8) | frame[1];
+    if(validity != calculateValidity(frame)) return FRAME_ERROR;
+    
+    uint8_t frame_id = frame[2];
+    
+    if(frame_id == FRAME_ID_DOWNLINK_TELEM) {
+        if(crc8(&frame[4], FRAME_SIZE - 4) == frame[3]) {
+            return FRAME_DOWNLINK;
+        }
+    } else if(frame_id == FRAME_ID_UPLINK_CONTROL) {
+        if(crc8(&frame[4], FRAME_SIZE - 4) == frame[3]) {
+            return FRAME_UPLINK;
+        }
+    }
+    
+    return FRAME_ERROR;
+}
+
 void encodeDownlinkTelem(uint8_t* frame, const DownlinkTelemetry* data) {
     memset(frame, 0, FRAME_SIZE);
     

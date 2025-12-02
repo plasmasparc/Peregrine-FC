@@ -20,34 +20,6 @@ uint32_t downlink_count = 0;
 uint32_t uplink_count = 0;
 uint32_t error_count = 0;
 
-enum FrameType {
-    FRAME_NONE,
-    FRAME_DOWNLINK,
-    FRAME_UPLINK,
-    FRAME_ERROR
-};
-
-FrameType identifyFrame(const uint8_t* frame, size_t size) {
-    if(size != FRAME_SIZE) return FRAME_ERROR;
-    
-    uint16_t validity = (frame[0] << 8) | frame[1];
-    if(validity != calculateValidity(frame)) return FRAME_ERROR;
-    
-    uint8_t frame_id = frame[2];
-    
-    if(frame_id == FRAME_ID_DOWNLINK_TELEM) {
-        if(crc8(&frame[4], FRAME_SIZE - 4) == frame[3]) {
-            return FRAME_DOWNLINK;
-        }
-    } else if(frame_id == FRAME_ID_UPLINK_CONTROL) {
-        if(crc8(&frame[4], FRAME_SIZE - 4) == frame[3]) {
-            return FRAME_UPLINK;
-        }
-    }
-    
-    return FRAME_ERROR;
-}
-
 void processDownlink() {
     if(decodeDownlinkTelem(rx_buffer, &telem)) {
         downlink_count++;
@@ -189,4 +161,5 @@ void loop() {
         display.println("s ago");
         display.display();
     }
+    delay(10);
 }
