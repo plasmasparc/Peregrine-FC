@@ -1,5 +1,4 @@
 #include "FrameProtocol.h"
-#include <string.h>
 
 uint8_t crc8(const uint8_t* data, size_t len) {
     uint8_t crc = 0xFF;
