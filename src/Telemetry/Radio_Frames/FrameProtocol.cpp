@@ -1,4 +1,5 @@
 #include "FrameProtocol.h"
+#include <string.h>
 
 uint8_t crc8(const uint8_t* data, size_t len) {
     uint8_t crc = 0xFF;
@@ -55,7 +56,7 @@ void encodeDownlinkTelem(uint8_t* frame, const DownlinkTelemetry* data) {
     frame[22] = data->satellites;
     frame[23] = data->fix ? 0x01 : 0x00;
     
-    frame[3] = crc8(&frame[2], FRAME_SIZE - 2);
+    frame[3] = crc8(&frame[4], FRAME_SIZE - 4);
     
     uint16_t validity = calculateValidity(frame);
     frame[0] = (validity >> 8) & 0xFF;
@@ -66,7 +67,7 @@ bool decodeDownlinkTelem(const uint8_t* frame, DownlinkTelemetry* data) {
     uint16_t validity = (frame[0] << 8) | frame[1];
     if (validity != calculateValidity(frame)) return false;
     if (frame[2] != FRAME_ID_DOWNLINK_TELEM) return false;
-    if (crc8(&frame[2], FRAME_SIZE - 2) != frame[3]) return false;
+    if (crc8(&frame[4], FRAME_SIZE - 4) != frame[3]) return false;
     
     int16_t roll = (frame[4] << 8) | frame[5];
     int16_t pitch = (frame[6] << 8) | frame[7];
@@ -76,8 +77,8 @@ bool decodeDownlinkTelem(const uint8_t* frame, DownlinkTelemetry* data) {
     data->pitch = pitch / 10.0f;
     data->yaw = yaw / 10.0f;
     
-    int32_t lat = (frame[10] << 24) | (frame[11] << 16) | (frame[12] << 8) | frame[13];
-    int32_t lon = (frame[14] << 24) | (frame[15] << 16) | (frame[16] << 8) | frame[17];
+    int32_t lat = ((int32_t)frame[10] << 24) | ((int32_t)frame[11] << 16) | ((int32_t)frame[12] << 8) | frame[13];
+    int32_t lon = ((int32_t)frame[14] << 24) | ((int32_t)frame[15] << 16) | ((int32_t)frame[16] << 8) | frame[17];
     int16_t alt = (frame[18] << 8) | frame[19];
     uint16_t speed = (frame[20] << 8) | frame[21];
     
@@ -109,7 +110,7 @@ void encodeUplinkControl(uint8_t* frame, const UplinkControl* data) {
     frame[10] = (data->motor_speed >> 8) & 0xFF;
     frame[11] = data->motor_speed & 0xFF;
     
-    frame[3] = crc8(&frame[2], FRAME_SIZE - 2);
+    frame[3] = crc8(&frame[4], FRAME_SIZE - 4);
     
     uint16_t validity = calculateValidity(frame);
     frame[0] = (validity >> 8) & 0xFF;
@@ -120,7 +121,7 @@ bool decodeUplinkControl(const uint8_t* frame, UplinkControl* data) {
     uint16_t validity = (frame[0] << 8) | frame[1];
     if (validity != calculateValidity(frame)) return false;
     if (frame[2] != FRAME_ID_UPLINK_CONTROL) return false;
-    if (crc8(&frame[2], FRAME_SIZE - 2) != frame[3]) return false;
+    if (crc8(&frame[4], FRAME_SIZE - 4) != frame[3]) return false;
     
     int16_t target_roll = (frame[4] << 8) | frame[5];
     int16_t target_pitch = (frame[6] << 8) | frame[7];

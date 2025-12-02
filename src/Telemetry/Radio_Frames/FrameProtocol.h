@@ -6,7 +6,7 @@
 #define FRAME_SIZE 24
 
 #define FRAME_ID_DOWNLINK_TELEM 0xD1
-#define FRAME_ID_UPLINK_CONTROL 0xU1
+#define FRAME_ID_UPLINK_CONTROL 0xA1
 
 struct DownlinkTelemetry {
     float roll;
