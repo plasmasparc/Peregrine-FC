@@ -1,17 +1,9 @@
 #include "LoRaRadio.h"
 #include "FrameProtocol.h"
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64
-#define OLED_RESET -1
-#define SCREEN_ADDRESS 0x3C
-
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+#include "DisplayManager.h"
 
 LoRaRadio lora;
+DisplayManager display_mgr;
 uint8_t rx_buffer[FRAME_SIZE];
 DownlinkTelemetry telem;
 UplinkControl ctrl;
@@ -36,29 +28,7 @@ void processDownlink() {
         Serial.print("Sats: "); Serial.println(telem.satellites);
         Serial.print("Fix: "); Serial.println(telem.fix);
         
-        display.clearDisplay();
-        display.setCursor(0,0);
-        display.print("DL:");
-        display.print(downlink_count);
-        display.print(" UL:");
-        display.print(uplink_count);
-        display.print(" E:");
-        display.println(error_count);
-        display.print("R:");
-        display.print(telem.roll,1);
-        display.print(" P:");
-        display.println(telem.pitch,1);
-        display.print("Y:");
-        display.println(telem.yaw,1);
-        display.print("Alt:");
-        display.print(telem.alt,1);
-        display.print(" Spd:");
-        display.println(telem.speed,1);
-        display.print("Sats:");
-        display.print(telem.satellites);
-        display.print(" Fix:");
-        display.println(telem.fix);
-        display.display();
+        display_mgr.showDownlinkTelemetry(&telem, downlink_count, uplink_count, error_count);
     } else {
         error_count++;
     }
@@ -75,24 +45,7 @@ void processUplink() {
         Serial.print("Yaw Rate: "); Serial.println(ctrl.yaw_rate);
         Serial.print("Motor Speed: "); Serial.println(ctrl.motor_speed);
         
-        display.clearDisplay();
-        display.setCursor(0,0);
-        display.print("DL:");
-        display.print(downlink_count);
-        display.print(" UL:");
-        display.print(uplink_count);
-        display.print(" E:");
-        display.println(error_count);
-        display.println("UPLINK CTRL");
-        display.print("TgtR:");
-        display.print(ctrl.target_roll,1);
-        display.print(" TgtP:");
-        display.println(ctrl.target_pitch,1);
-        display.print("YawRate:");
-        display.println(ctrl.yaw_rate,2);
-        display.print("Motor:");
-        display.println(ctrl.motor_speed);
-        display.display();
+        display_mgr.showUplinkControl(&ctrl, downlink_count, uplink_count, error_count);
     } else {
         error_count++;
     }
@@ -101,32 +54,21 @@ void processUplink() {
 void setup() {
     Serial.begin(115200);
     
-    if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    if(!display_mgr.init()) {
         Serial.println("SSD1306 init failed");
         while(1);
     }
     
-    display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(SSD1306_WHITE);
-    display.setCursor(0,0);
-    display.println("LoRa RX Init...");
-    display.display();
+    display_mgr.showInitMessage("LoRa RX Init...");
     
     if(!lora.init()) {
         Serial.println("LoRa init failed");
-        display.clearDisplay();
-        display.setCursor(0,0);
-        display.println("LoRa FAIL");
-        display.display();
+        display_mgr.showInitMessage("LoRa FAIL");
         while(1);
     }
     
     Serial.println("LoRa RX ready");
-    display.clearDisplay();
-    display.setCursor(0,0);
-    display.println("LoRa RX Ready");
-    display.display();
+    display_mgr.showInitMessage("LoRa RX Ready");
     delay(1000);
 }
 
@@ -153,13 +95,8 @@ void loop() {
     }
     
     if(millis() - last_packet_time > 5000 && (downlink_count > 0 || uplink_count > 0)) {
-        display.clearDisplay();
-        display.setCursor(0,0);
-        display.println("NO SIGNAL");
-        display.print("Last: ");
-        display.print((millis() - last_packet_time)/1000);
-        display.println("s ago");
-        display.display();
+        display_mgr.showNoSignal((millis() - last_packet_time) / 1000);
     }
+    
     delay(10);
 }

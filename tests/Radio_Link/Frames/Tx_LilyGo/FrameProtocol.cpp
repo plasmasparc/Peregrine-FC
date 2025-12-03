@@ -47,7 +47,7 @@ void encodeDownlinkTelem(uint8_t* frame, const DownlinkTelemetry* data) {
     
     int16_t roll = (int16_t)(data->roll * 10);
     int16_t pitch = (int16_t)(data->pitch * 10);
-    uint16_t yaw = (uint16_t)(data->yaw * 10);
+    int16_t yaw = (int16_t)(data->yaw * 10);
     
     frame[4] = (roll >> 8) & 0xFF;
     frame[5] = roll & 0xFF;
@@ -91,7 +91,7 @@ bool decodeDownlinkTelem(const uint8_t* frame, DownlinkTelemetry* data) {
     
     int16_t roll = (frame[4] << 8) | frame[5];
     int16_t pitch = (frame[6] << 8) | frame[7];
-    uint16_t yaw = (frame[8] << 8) | frame[9];
+    int16_t yaw = (frame[8] << 8) | frame[9];
     
     data->roll = roll / 10.0f;
     data->pitch = pitch / 10.0f;
