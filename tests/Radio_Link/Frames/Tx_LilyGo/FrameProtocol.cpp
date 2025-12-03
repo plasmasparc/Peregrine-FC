@@ -117,8 +117,8 @@ void encodeUplinkControl(uint8_t* frame, const UplinkControl* data) {
     
     frame[2] = FRAME_ID_UPLINK_CONTROL;
     
-    int16_t target_roll = (int16_t)(data->target_roll * 10);
-    int16_t target_pitch = (int16_t)(data->target_pitch * 10);
+    int16_t target_roll = (int16_t)(data->target_roll * 100);
+    int16_t target_pitch = (int16_t)(data->target_pitch * 100);
     int16_t yaw_rate = (int16_t)(data->yaw_rate * 100);
     
     frame[4] = (target_roll >> 8) & 0xFF;
@@ -148,8 +148,8 @@ bool decodeUplinkControl(const uint8_t* frame, UplinkControl* data) {
     int16_t yaw_rate = (frame[8] << 8) | frame[9];
     uint16_t motor_speed = (frame[10] << 8) | frame[11];
     
-    data->target_roll = target_roll / 10.0f;
-    data->target_pitch = target_pitch / 10.0f;
+    data->target_roll = target_roll / 100.0f;
+    data->target_pitch = target_pitch / 100.0f;
     data->yaw_rate = yaw_rate / 100.0f;
     data->motor_speed = motor_speed;
     
