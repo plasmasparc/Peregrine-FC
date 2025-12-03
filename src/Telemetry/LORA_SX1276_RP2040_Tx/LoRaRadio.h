@@ -51,7 +51,9 @@ public:
     
     bool init();
     void send(const String& message);
+    void sendFrame(const uint8_t* frame, size_t size);
     bool receive();
+    size_t receiveFrame(uint8_t* buffer, size_t max_size);
     
     // Message access
     bool hasMessage() const { return message_available; }

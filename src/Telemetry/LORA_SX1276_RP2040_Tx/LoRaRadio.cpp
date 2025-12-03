@@ -60,6 +60,20 @@ void LoRaRadio::send(const String& message) {
     last_send_time = millis();
 }
 
+void LoRaRadio::sendFrame(const uint8_t* frame, size_t size) {
+    // Start packet transmission
+    LoRa.beginPacket();
+    
+    // Send raw byte data from the frame buffer
+    LoRa.write(frame, size);
+    
+    // Finish packet transmission
+    LoRa.endPacket();
+
+    // Update last send time
+    last_send_time = millis();
+}
+
 bool LoRaRadio::receive() {
     int packet_size = LoRa.parsePacket();
     
@@ -82,6 +96,25 @@ bool LoRaRadio::receive() {
     }
     
     return false;
+}
+
+size_t LoRaRadio::receiveFrame(uint8_t* buffer, size_t max_size) {
+    int packet_size = LoRa.parsePacket();
+    
+    if (packet_size <= 0) {
+        return 0;
+    }
+    
+    size_t bytes_to_read = min((size_t)packet_size, max_size);
+    size_t bytes_read = 0;
+
+    while (LoRa.available() && bytes_read < bytes_to_read) {
+        buffer[bytes_read++] = (uint8_t)LoRa.read();
+    }
+    
+    last_receive_time = millis();
+    
+    return bytes_read;
 }
 
 float LoRaRadio::calculateAirtime(size_t payload_bytes) const {
