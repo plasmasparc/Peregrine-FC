@@ -75,9 +75,6 @@ void loop() {
             if(!failsafe_mode) {
                 failsafe_mode = true;
                 motor.stop();
-                setTargetPitch(-1.0f);
-                setTargetRoll(7.0f);
-                yaw_rate = 2.0f;
                 last_failsafe_tx = millis();
             }
             
@@ -94,6 +91,13 @@ void loop() {
         if(integrated_yaw < -180.0f) integrated_yaw += 360.0f;
         
         last_loop_time = millis();
+        if(failsafe_mode == true){
+          setTargetPitch(-2.0f);
+          setTargetRoll(7.0f);
+          setTargetYaw(integrated_yaw);
+          yaw_rate = 5.0f;
+          
+        }
     }
 }
 
