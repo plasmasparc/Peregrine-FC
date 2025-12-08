@@ -31,6 +31,7 @@ private:
     
     uint32_t last_rx_time;
     uint32_t last_failsafe_tx;
+    uint32_t last_update_time;
     bool failsafe_mode;
     float integrated_yaw;
     float yaw_rate;

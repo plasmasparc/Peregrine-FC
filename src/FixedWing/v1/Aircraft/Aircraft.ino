@@ -23,6 +23,7 @@ void setup() {
 }
 
 void loop() {
+    
     if(millis() - last_loop_time >= 20) {
         fc.update();
         last_loop_time = millis();

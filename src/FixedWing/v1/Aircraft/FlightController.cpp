@@ -2,12 +2,21 @@
 
 FlightController::FlightController(LoRaRadio* lora, BLDCMotor* motor)
     : lora(lora), motor(motor), last_rx_time(0), last_failsafe_tx(0),
-      failsafe_mode(false), integrated_yaw(0.0f), yaw_rate(0.0f) {}
+      last_update_time(0), failsafe_mode(false), integrated_yaw(0.0f), yaw_rate(0.0f) {}
 
 void FlightController::update() {
+    uint32_t now = millis();
+    
+    if(last_update_time == 0) {
+        last_update_time = now;
+        return;
+    }
+    
     handleUplink();
     handleFailsafe();
     updateYaw();
+    
+    last_update_time = now;
 }
 
 void FlightController::handleUplink() {
@@ -53,7 +62,10 @@ void FlightController::handleFailsafe() {
 }
 
 void FlightController::updateYaw() {
-    integrated_yaw += yaw_rate * 0.02f;
+    uint32_t now = millis();
+    float dt = (now - last_update_time) * 0.001f;
+    
+    integrated_yaw += yaw_rate * dt;
     if(integrated_yaw > 180.0f) integrated_yaw -= 360.0f;
     if(integrated_yaw < -180.0f) integrated_yaw += 360.0f;
 }
