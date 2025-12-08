@@ -33,5 +33,8 @@ void getGPSTime(uint8_t* hour, uint8_t* minute, uint8_t* seconds);
 void getAllGPSData(double* lat, double* lon, float* alt, float* speed, 
                    uint8_t* hour, uint8_t* minute, uint8_t* seconds,
                    uint8_t* satellites, bool* fix);
+void getAllGPSDataV1(double* lat, double* lon, float* alt, float* speed,
+                     uint8_t* hour, uint8_t* minute, uint8_t* seconds,
+                     uint8_t* satellites, bool* fix, float* course);
 
 #endif
