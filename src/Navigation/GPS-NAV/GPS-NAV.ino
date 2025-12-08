@@ -111,4 +111,12 @@ void printData() {
     
     Serial.print("Heading Bias: ");
     Serial.print(gpsNav.getHeadingRate() - rate_z * 57.29578f, 3);
-    Seria
+    Serial.println(" deg/s");
+    
+    Serial.print("Yaw Command: ");
+    Serial.print(gpsNav.getYawRateCommand(), 2);
+    Serial.println(" deg/s");
+    
+    Serial.print("Valid: ");
+    Serial.println(gpsNav.isValid() ? "YES" : "NO");
+}
