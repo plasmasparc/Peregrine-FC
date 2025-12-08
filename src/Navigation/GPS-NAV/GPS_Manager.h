@@ -17,6 +17,7 @@ struct GPSManagerData {
     volatile double longitude;
     volatile float altitude;
     volatile float speed;
+    volatile float course;
     volatile uint8_t hour;
     volatile uint8_t minute;
     volatile uint8_t seconds;

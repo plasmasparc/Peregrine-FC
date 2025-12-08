@@ -23,6 +23,7 @@ static void gpsAlarmISR() {
         gps_manager_data.longitude = data.longitude;
         gps_manager_data.altitude = data.altitude;
         gps_manager_data.speed = data.speed;
+        gps_manager_data.course = data.course;
         gps_manager_data.hour = data.hour;
         gps_manager_data.minute = data.minute;
         gps_manager_data.seconds = data.seconds;
