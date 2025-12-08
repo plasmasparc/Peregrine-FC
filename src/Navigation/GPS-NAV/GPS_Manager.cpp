@@ -101,3 +101,19 @@ void getAllGPSData(double* lat, double* lon, float* alt, float* speed,
     *fix = gps_manager_data.fix;
     restore_interrupts(status);
 }
+
+void getAllGPSDataV1(double* lat, double* lon, float* alt, float* speed,
+                     uint8_t* hour, uint8_t* minute, uint8_t* seconds,
+                     uint8_t* satellites, bool* fix, float* course) {
+    uint32_t status = save_and_disable_interrupts();
+    *lat = gps_manager_data.latitude;
+    *lon = gps_manager_data.longitude;
+    *alt = gps_manager_data.altitude;
+    *speed = gps_manager_data.speed;
+    *hour = gps_manager_data.hour;
+    *minute = gps_manager_data.minute;
+    *seconds = gps_manager_data.seconds;
+    *satellites = gps_manager_data.satellites;
+    *fix = gps_manager_data.fix;
+    restore_interrupts(status);
+}
