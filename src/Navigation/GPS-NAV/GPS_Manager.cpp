@@ -116,5 +116,6 @@ void getAllGPSDataV1(double* lat, double* lon, float* alt, float* speed,
     *seconds = gps_manager_data.seconds;
     *satellites = gps_manager_data.satellites;
     *fix = gps_manager_data.fix;
+    *course = gps_manager_data.course;
     restore_interrupts(status);
 }
