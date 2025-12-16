@@ -1,0 +1,5 @@
+heading=   0.0 deg  ->  dlon/dt=+0.000000000e+00 deg/s,  dlat/dt=+8.995525650e-05 deg/s
+heading= 270.0 deg  ->  dlon/dt=-1.309242168e-04 deg/s,  dlat/dt=-1.652451254e-20 deg/s
+heading=  90.0 deg  ->  dlon/dt=+1.309242168e-04 deg/s,  dlat/dt=+5.508170847e-21 deg/s
+heading= 180.0 deg  ->  dlon/dt=+1.603359230e-20 deg/s,  dlat/dt=-8.995525650e-05 deg/s
+heading=  45.0 deg  ->  dlon/dt=+9.257740149e-05 deg/s,  dlat/dt=+6.360797187e-05 deg/s
