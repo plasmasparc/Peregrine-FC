@@ -40,7 +40,7 @@ void loop() {
             float lambda_target = line.substring(parts[3], parts[4] - 1).toFloat();
             float phi_target = line.substring(parts[4], line.length()).toFloat();
             
-            psi = optimalHeading(lambda, phi, lambda_target, phi_target);
+            psi = optimalHeading(lambda, phi, lambda_target, phi_target); //+0.7853981633974483 test error
             
         } else if(mode == MODE_LOITER) {
             if(part_count < 8) return;
