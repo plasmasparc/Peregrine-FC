@@ -29,7 +29,7 @@ lam_c = lam_center + offset_x / (N_ref * np.cos(phi_center))
 phi_c = phi_center + offset_y / M_ref
 
 R = 500
-k = -0.25 * R
+k = 0.25 * R
 lam_orbit = 1
 v = 20
 
@@ -65,7 +65,7 @@ for i in range(n_grid):
         dy = y - y_c
         
         r = np.sqrt(dx**2 + dy**2)
-        theta = np.arctan2(dx, dy)
+        theta = np.arctan2(-dx, -dy)
         
         psi = theta + lam_orbit * (np.arctan((R - r) / k) + np.pi/2)
         # Stange ... -> something fishy with the tetha
@@ -136,7 +136,7 @@ for traj_id in range(n_traj):
             dx = x - x_c
             dy = y - y_c
             r = np.sqrt(dx**2 + dy**2)
-            theta = np.arctan2(dx, dy)
+            theta = np.arctan2(-dx, -dy)
             
             psi = theta + lam_orbit * (np.arctan((R - r) / k) + np.pi/2)
             
