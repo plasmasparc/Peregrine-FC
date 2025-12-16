@@ -68,6 +68,7 @@ for i in range(n_grid):
         theta = np.arctan2(dx, dy)
         
         psi = theta + lam_orbit * (np.arctan((R - r) / k) + np.pi/2)
+        # Stange ... -> something fishy with the tetha
         
         U[i, j] = np.sin(psi)
         V[i, j] = np.cos(psi)
