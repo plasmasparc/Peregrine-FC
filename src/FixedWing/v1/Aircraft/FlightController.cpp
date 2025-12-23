@@ -1,73 +1,60 @@
 #include "FlightController.h"
 
 FlightController::FlightController(LoRaRadio* lora, BLDCMotor* motor)
-    : lora(lora), motor(motor), last_rx_time(0), last_failsafe_tx(0),
-      last_update_time(0), failsafe_mode(false), integrated_yaw(0.0f), yaw_rate(0.0f) {}
+    : lora(lora), motor(motor), mode(MODE_MANUAL),
+      last_rx_time(0), last_telemetry_tx(0) {}
 
 void FlightController::update() {
-    uint32_t now = millis();
-    
-    if(last_update_time == 0) {
-        last_update_time = now;
-        return;
-    }
-    
-    handleUplink();
-    handleFailsafe();
-    updateYaw();
-    
-    last_update_time = now;
+    processUplink();
+    checkFailsafe();
+    executeMode();
+    sendTelemetry();
 }
 
-void FlightController::handleUplink() {
+void FlightController::processUplink() {
     size_t bytes = lora->receiveFrame(rx_frame, FRAME_SIZE);
     
-    if(bytes == FRAME_SIZE && identifyFrame(rx_frame, FRAME_SIZE) == FRAME_UPLINK) {
-        if(decodeUplinkControl(rx_frame, &ctrl)) {
+    if(bytes == FRAME_SIZE) {
+        FrameType type = identifyFrame(rx_frame, FRAME_SIZE);
+        
+        if(type == FRAME_UPLINK) {
             last_rx_time = millis();
-            failsafe_mode = false;
-            
-            setTargetPitch(ctrl.target_pitch);
-            setTargetRoll(ctrl.target_roll);
-            setTargetYaw(integrated_yaw);
-            yaw_rate = ctrl.yaw_rate;
-            motor->setSpeed(ctrl.motor_speed);
-            
-            buildTelemetry(&telem);
-            encodeDownlinkTelem(tx_frame, &telem);
+            mode = MODE_MANUAL;
+            manual_ctrl.processControl(rx_frame);
         }
     }
 }
 
-void FlightController::handleFailsafe() {
-    if(millis() - last_rx_time > 500) {
-        if(!failsafe_mode) {
-            failsafe_mode = true;
+void FlightController::executeMode() {
+    switch(mode) {
+        case MODE_MANUAL:
+            manual_ctrl.execute(motor);
+            break;
+            
+        case MODE_AUTO:
+            auto_ctrl.execute(motor);
+            break;
+            
+        case MODE_FAILSAFE:
             motor->stop();
-            last_failsafe_tx = millis();
-        }
-        
-        if(millis() - last_failsafe_tx >= 111) {
-            buildTelemetry(&telem);
-            encodeDownlinkTelem(tx_frame, &telem);
-            lora->sendFrame(tx_frame, FRAME_SIZE);
-            last_failsafe_tx = millis();
-        }
-        
-        setTargetPitch(-2.0f);
-        setTargetRoll(7.0f);
-        setTargetYaw(integrated_yaw);
-        yaw_rate = 5.0f;
+            manual_ctrl.setRecoveryAttitude();
+            break;
     }
 }
 
-void FlightController::updateYaw() {
-    uint32_t now = millis();
-    float dt = (now - last_update_time) * 0.001f;
-    
-    integrated_yaw += yaw_rate * dt;
-    if(integrated_yaw > 180.0f) integrated_yaw -= 360.0f;
-    if(integrated_yaw < -180.0f) integrated_yaw += 360.0f;
+void FlightController::checkFailsafe() {
+    if(millis() - last_rx_time > 500 && last_rx_time != 0) {
+        mode = MODE_FAILSAFE;
+    }
+}
+
+void FlightController::sendTelemetry() {
+    if(millis() - last_telemetry_tx >= 111) {
+        buildTelemetry(&telem);
+        encodeDownlinkTelem(tx_frame, &telem);
+        lora->sendFrame(tx_frame, FRAME_SIZE);
+        last_telemetry_tx = millis();
+    }
 }
 
 void FlightController::buildTelemetry(DownlinkTelemetry* telem) {
