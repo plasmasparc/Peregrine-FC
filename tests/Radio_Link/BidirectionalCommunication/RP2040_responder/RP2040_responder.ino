@@ -1,24 +1,25 @@
 #include <SPI.h>
 #include <LoRa.h>
 
-#define LORA_RX_PIN 0
-#define LORA_TX_PIN 3
+// Default pin configuration for RP2040
+#define LORA_RX_PIN  4
+#define LORA_TX_PIN  3
 #define LORA_SCK_PIN 2
-#define LORA_SS_PIN 1
-#define LORA_RST_PIN 6
+#define LORA_SS_PIN  6
+#define LORA_RST_PIN 7
 #define LORA_DIO0_PIN 5
 
-#define LORA_FREQUENCY 868E6
-#define LORA_BANDWIDTH 125E3
-#define LORA_SPREADING_FACTOR 7
+// Default RF parameters
+#define LORA_FREQUENCY 868E6     // 868 MHz (EU band)
+#define LORA_BANDWIDTH 125E3     // 125 kHz
+#define LORA_SPREADING_FACTOR 7  // SF7
 #define LORA_SYNC_WORD 0xF3
-#define LORA_TX_POWER 20
-#define LORA_CODING_RATE 5
+#define LORA_TX_POWER 20         // 20 dBm (max for SX1276)
+#define LORA_CODING_RATE 5       // 4/5
 
 #define PAYLOAD_SIZE 30
 
 uint8_t rx_buffer[PAYLOAD_SIZE];
-uint32_t last_debug = 0;
 
 void setup() {
     Serial.begin(115200);
@@ -45,58 +46,38 @@ void setup() {
     LoRa.setTxPower(LORA_TX_POWER, PA_OUTPUT_PA_BOOST_PIN);
     LoRa.setCodingRate4(LORA_CODING_RATE);
     
-    LoRa.receive();
-    
     Serial.println("RP2040 Responder Ready");
-    Serial.print("Frequency: ");
-    Serial.println(LORA_FREQUENCY);
-    Serial.print("Bandwidth: ");
-    Serial.println(LORA_BANDWIDTH);
-    Serial.print("SF: ");
-    Serial.println(LORA_SPREADING_FACTOR);
-    Serial.print("Sync: 0x");
-    Serial.println(LORA_SYNC_WORD, HEX);
 }
 
 void loop() {
     int packet_size = LoRa.parsePacket();
     
-    if(packet_size != 0) {
-        Serial.print("Packet size: ");
+    if(packet_size > 0) {
+        Serial.print("RX size: ");
         Serial.println(packet_size);
         
-        if(packet_size == PAYLOAD_SIZE) {
-            size_t idx = 0;
-            while(LoRa.available() && idx < PAYLOAD_SIZE) {
-                rx_buffer[idx++] = LoRa.read();
-            }
+        size_t idx = 0;
+        while(LoRa.available() && idx < PAYLOAD_SIZE) {
+            rx_buffer[idx++] = LoRa.read();
+        }
+        
+        int rssi = LoRa.packetRssi();
+        float snr = LoRa.packetSnr();
+        
+        Serial.print("Read ");
+        Serial.print(idx);
+        Serial.print(" bytes | RSSI: ");
+        Serial.print(rssi);
+        Serial.print(" | SNR: ");
+        Serial.println(snr);
+        
+        if(idx == PAYLOAD_SIZE) {
+            LoRa.beginPacket();
+            LoRa.write(rx_buffer, PAYLOAD_SIZE);
+            LoRa.endPacket();
             
-            if(idx == PAYLOAD_SIZE) {
-                int rssi = LoRa.packetRssi();
-                float snr = LoRa.packetSnr();
-                
-                Serial.print("RX OK | RSSI: ");
-                Serial.print(rssi);
-                Serial.print(" | SNR: ");
-                Serial.println(snr);
-                
-                delay(5);
-                
-                LoRa.beginPacket();
-                LoRa.write(rx_buffer, PAYLOAD_SIZE);
-                LoRa.endPacket();
-                
-                Serial.println("Echo sent");
-                
-                LoRa.receive();
-            } else {
-                Serial.println("Partial read");
-            }
+            Serial.println("Echo sent");
         }
     }
-    
-    if(millis() - last_debug > 5000) {
-        Serial.println("Listening...");
-        last_debug = millis();
-    }
+    delay(100);
 }

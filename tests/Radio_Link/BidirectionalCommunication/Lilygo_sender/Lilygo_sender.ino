@@ -25,7 +25,7 @@ Adafruit_SSD1306 display(OLED_WIDTH, OLED_HEIGHT, &Wire, OLED_RESET);
 
 #define PAYLOAD_SIZE 30
 #define TIMEOUT_MS 130
-#define CYCLE_DELAY_MS 910
+#define CYCLE_DELAY_MS 91
 
 uint8_t tx_buffer[PAYLOAD_SIZE];
 uint8_t rx_buffer[PAYLOAD_SIZE];
@@ -63,6 +63,9 @@ void setup() {
     LoRa.setSyncWord(LORA_SYNC_WORD);
     LoRa.setTxPower(LORA_TX_POWER, PA_OUTPUT_PA_BOOST_PIN);
     LoRa.setCodingRate4(LORA_CODING_RATE);
+    //LoRa.setGain(0);
+    //LoRa.enableCrc();  // Or disableCrc()
+    //LoRa.disableCrc();
     
     display.println("LoRa OK");
     display.display();
