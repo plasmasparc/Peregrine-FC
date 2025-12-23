@@ -5,6 +5,8 @@
 #include <WebServer.h>
 
 #define MAX_POSITIONS 100
+#define WIFI_SSID "attila"
+#define WIFI_PASSWORD "attila12"
 
 struct Position {
     double lat;

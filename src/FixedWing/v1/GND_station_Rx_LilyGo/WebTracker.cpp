@@ -6,7 +6,12 @@ WebTracker::WebTracker() : server(80) {
 }
 
 void WebTracker::init() {
-    WiFi.softAP("attila", "attila12");
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    
+    while(WiFi.status() != WL_CONNECTED) {
+        delay(500);
+    }
     
     server.on("/", [this]() { handleRoot(); });
     server.begin();
