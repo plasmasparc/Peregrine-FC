@@ -29,6 +29,7 @@ private:
     uint16_t position_index;
     
     void handleRoot();
+    void handleData();
     String generateHTML();
 };
 
