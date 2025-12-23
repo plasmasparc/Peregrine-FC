@@ -18,11 +18,9 @@ void WebTracker::init() {
     server.begin();
 }
 
-void WebTracker::addPosition(double lat, double lon, float roll, float pitch) {
+void WebTracker::addPosition(double lat, double lon) {
     positions[position_index].lat = lat;
     positions[position_index].lon = lon;
-    positions[position_index].roll = roll;
-    positions[position_index].pitch = pitch;
     positions[position_index].timestamp_ms = millis();
     
     position_index = (position_index + 1) % MAX_POSITIONS;
@@ -45,8 +43,6 @@ void WebTracker::handleData() {
         uint16_t latest = (position_index == 0) ? (position_count - 1) : (position_index - 1);
         json += "\"lat\":" + String(positions[latest].lat, 7) + ",";
         json += "\"lon\":" + String(positions[latest].lon, 7) + ",";
-        json += "\"roll\":" + String(positions[latest].roll, 1) + ",";
-        json += "\"pitch\":" + String(positions[latest].pitch, 1) + ",";
         
         json += "\"coords\":[";
         for(uint16_t i = 0; i < position_count; i++) {
@@ -73,23 +69,12 @@ void WebTracker::handleData() {
 
 String WebTracker::generateHTML() {
     String html = "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Flight Tracker</title>";
-    html += "<style>body{margin:0;font-family:monospace;}#map{width:70vw;height:100vh;float:left;}#horizon{width:30vw;height:100vh;float:right;background:#000;position:relative;}</style></head><body>";
-    html += "<div id='map'></div><div id='horizon'><canvas id='ahi' width='400' height='400'></canvas></div>";
-    html += "<script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>";
+    html += "<style>body{margin:0;font-family:monospace;}#map{width:100vw;height:100vh;}</style></head><body>";
+    html += "<div id='map'></div><script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>";
     html += "<link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'/><script>";
     html += "var map=L.map('map').setView([47.4979,19.0402],13);";
     html += "L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);";
     html += "var polyline=null;var marker=null;var arrow=null;";
-    html += "var canvas=document.getElementById('ahi');var ctx=canvas.getContext('2d');";
-    html += "function drawHorizon(roll,pitch){ctx.clearRect(0,0,400,400);ctx.save();ctx.translate(200,200);";
-    html += "ctx.rotate(-roll*Math.PI/180);ctx.translate(0,pitch*3);";
-    html += "ctx.fillStyle='#87CEEB';ctx.fillRect(-200,-200,400,200);";
-    html += "ctx.fillStyle='#8B4513';ctx.fillRect(-200,0,400,200);";
-    html += "ctx.strokeStyle='#FFF';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-200,0);ctx.lineTo(200,0);ctx.stroke();";
-    html += "ctx.restore();ctx.strokeStyle='#FF0';ctx.lineWidth=2;";
-    html += "ctx.beginPath();ctx.moveTo(150,200);ctx.lineTo(180,200);ctx.stroke();";
-    html += "ctx.beginPath();ctx.moveTo(220,200);ctx.lineTo(250,200);ctx.stroke();";
-    html += "ctx.beginPath();ctx.moveTo(200,205);ctx.lineTo(195,200);ctx.lineTo(200,200);ctx.lineTo(205,200);ctx.lineTo(200,205);ctx.stroke();}";
     html += "function update(){fetch('/data').then(r=>r.json()).then(d=>{";
     html += "if(d.count>0){";
     html += "if(polyline)map.removeLayer(polyline);if(marker)map.removeLayer(marker);if(arrow)map.removeLayer(arrow);";
@@ -98,7 +83,7 @@ String WebTracker::generateHTML() {
     html += "map.setView([d.lat,d.lon],15);";
     html += "if(d.count>=2){";
     html += "arrow=L.marker([d.lat,d.lon],{icon:L.divIcon({html:'<div style=\"transform:rotate('+d.angle+'deg);font-size:24px;line-height:24px;\">▲</div>',className:'',iconSize:[24,24]})}).addTo(map);";
-    html += "}drawHorizon(d.roll,d.pitch);};});}";
+    html += "}};});}";
     html += "setInterval(update,200);update();";
     html += "</script></body></html>";
     return html;

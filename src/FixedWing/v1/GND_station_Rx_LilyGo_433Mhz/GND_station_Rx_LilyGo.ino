@@ -49,7 +49,7 @@ void loop() {
             if(decodeDownlinkTelem(rx_buffer, &last_telem)) {
                 downlink_count++;
                 last_receive_ms = millis();
-                tracker.addPosition(last_telem.lat, last_telem.lon, last_telem.roll, last_telem.pitch);
+                tracker.addPosition(last_telem.lat, last_telem.lon);
                 
                 #if DISPLAY_DOWNLINK_ONLY
                 display.showDownlinkTelemetry(&last_telem, downlink_count, uplink_count, error_count, tracker.getIPAddress().c_str());
