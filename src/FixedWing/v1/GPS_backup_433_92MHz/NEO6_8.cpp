@@ -1,56 +1,60 @@
 #include "NEO6_8.h"
 
-static Adafruit_GPS GPS(&GPS_SERIAL);
-
 void NEO6_8::init() {
-    // Configure serial
-    GPS_SERIAL.setRX(GPS_RX_PIN);
-    GPS_SERIAL.setTX(GPS_TX_PIN);
-    GPS_SERIAL.setFIFOSize(GPS_RX_BUFFER_SIZE);
-    GPS_SERIAL.begin(GPS_BAUD_RATE);
+    gps_serial = &Serial2;
+    gps_serial->begin(GPS_BAUD_RATE, SERIAL_8N1, GPS_RX_PIN, GPS_TX_PIN);
     
-    // Set update rate
-    GPS.sendCommand(GPS_UPDATE_RATE);
-    
-    // Request RMC (recommended minimum) and GGA (fix data) only
-    GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
-    
-    delay(100);
-    
-    gps_data = {0};
+    gps_data.year = 0;
+    gps_data.month = 0;
+    gps_data.day = 0;
+    gps_data.hour = 0;
+    gps_data.minute = 0;
+    gps_data.seconds = 0;
+    gps_data.latitude = 0.0;
+    gps_data.longitude = 0.0;
+    gps_data.altitude = 0.0;
+    gps_data.speed = 0.0;
+    gps_data.course = 0.0;
+    gps_data.fix = false;
+    gps_data.satellites = 0;
 }
 
 void NEO6_8::update() {
-    while (GPS.available()) {
-        char c = GPS.read();
-        
-        if (GPS.newNMEAreceived()) {
-            if (GPS.parse(GPS.lastNMEA())) {
-                if (GPS.fix) {
-                    // Time
-                    gps_data.year = GPS.year;
-                    gps_data.month = GPS.month;
-                    gps_data.day = GPS.day;
-                    gps_data.hour = GPS.hour;
-                    gps_data.minute = GPS.minute;
-                    gps_data.seconds = GPS.seconds;
-                    
-                    // Position
-                    gps_data.latitude = GPS.latitudeDegrees;
-                    gps_data.longitude = GPS.longitudeDegrees;
-                    gps_data.altitude = GPS.altitude;
-                    
-                    // Motion
-                    gps_data.speed = GPS.speed * 0.51444f;  // knots to m/s
-                    gps_data.course = GPS.angle;
-                    
-                    // Status
-                    gps_data.fix = true;
-                    gps_data.satellites = GPS.satellites;
-                } else {
-                    gps_data.fix = false;
-                }
-            }
-        }
+    while(gps_serial->available() > 0) {
+        gps.encode(gps_serial->read());
+    }
+    
+    if(gps.location.isUpdated()) {
+        gps_data.latitude = gps.location.lat();
+        gps_data.longitude = gps.location.lng();
+        gps_data.fix = gps.location.isValid();
+    }
+    
+    if(gps.altitude.isUpdated()) {
+        gps_data.altitude = gps.altitude.meters();
+    }
+    
+    if(gps.speed.isUpdated()) {
+        gps_data.speed = gps.speed.mps();
+    }
+    
+    if(gps.course.isUpdated()) {
+        gps_data.course = gps.course.deg();
+    }
+    
+    if(gps.satellites.isUpdated()) {
+        gps_data.satellites = gps.satellites.value();
+    }
+    
+    if(gps.date.isUpdated()) {
+        gps_data.year = gps.date.year();
+        gps_data.month = gps.date.month();
+        gps_data.day = gps.date.day();
+    }
+    
+    if(gps.time.isUpdated()) {
+        gps_data.hour = gps.time.hour();
+        gps_data.minute = gps.time.minute();
+        gps_data.seconds = gps.time.second();
     }
 }
