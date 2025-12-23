@@ -9,6 +9,18 @@ void FlightController::update() {
     checkFailsafe();
     executeMode();
     sendTelemetry();
+    
+    const char* mode_str = (mode == MODE_MANUAL) ? "MANUAL" : 
+                           (mode == MODE_AUTO) ? "AUTO" : "FAILSAFE";
+    
+    Serial.print("Mode: ");
+    Serial.print(mode_str);
+    Serial.print(" | Tgt R: ");
+    Serial.print(manual_ctrl.getTargetRoll(), 1);
+    Serial.print(" P: ");
+    Serial.print(manual_ctrl.getTargetPitch(), 1);
+    Serial.print(" Y: ");
+    Serial.println(manual_ctrl.getIntegratedYaw(), 1);
 }
 
 void FlightController::processUplink() {

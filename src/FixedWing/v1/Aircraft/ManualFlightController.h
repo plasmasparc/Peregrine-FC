@@ -14,6 +14,10 @@ public:
     void execute(BLDCMotor* motor);
     void setRecoveryAttitude();
     
+    float getTargetRoll() const { return ctrl.target_roll; }
+    float getTargetPitch() const { return ctrl.target_pitch; }
+    float getIntegratedYaw() const { return integrated_yaw; }
+    
 private:
     UplinkControl ctrl;
     float integrated_yaw;
