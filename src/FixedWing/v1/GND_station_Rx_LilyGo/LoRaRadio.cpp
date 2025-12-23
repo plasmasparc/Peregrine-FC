@@ -28,23 +28,23 @@ LoRaRadio::LoRaRadio(const LoRaConfig& cfg) : config(cfg) {
 }
 
 bool LoRaRadio::init() {
-    // Configure SPI pins
-    SPI.begin(config.sck_pin,config.tx_pin,config.rx_pin,config.ss_pin);
+    SPI.begin(config.sck_pin, config.tx_pin, config.rx_pin, config.ss_pin);
     
-    // Set LoRa pins
     LoRa.setPins(config.ss_pin, config.rst_pin, config.dio0_pin);
     
-    // Initialize LoRa radio
     if (!LoRa.begin(config.frequency)) {
         return false;
     }
     
-    // Configure radio parameters
     LoRa.setSignalBandwidth(config.bandwidth);
     LoRa.setSpreadingFactor(config.spreading_factor);
     LoRa.setSyncWord(config.sync_word);
-    LoRa.setTxPower(config.tx_power);//, PA_OUTPUT_PA_BOOST_PIN);
+    LoRa.setTxPower(config.tx_power);
     LoRa.setCodingRate4(config.coding_rate);
+    
+    // Disable AGC - use LNA gain register instead
+    LoRa.writeRegister(0x0C, 0x23);  // RegLna: LNA gain = max, LnaBoostHf = 150%
+    LoRa.writeRegister(0x26, 0x0C);  // RegModemConfig3: AGC off, LowDataRateOptimize auto
     
     return true;
 }

@@ -24,7 +24,7 @@ void setup() {
 }
 
 void loop() {
-    if(millis() - last_send_time >= 60) {
+    if(millis() - last_send_time >= 110) {
         float roll, pitch, yaw;
         getRollPitchYawSmoothed(&roll, &pitch, &yaw);
         
