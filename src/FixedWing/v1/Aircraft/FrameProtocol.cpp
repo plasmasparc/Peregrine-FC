@@ -20,6 +20,13 @@ uint16_t calculateValidity(const uint8_t* frame) {
 }
 
 FrameType identifyFrame(const uint8_t* frame, size_t size) {
+    if(size == CMD_FRAME_SIZE) {
+        if(identifyCommand(frame) != CMD_ERROR) {
+            return FRAME_COMMAND;
+        }
+        return FRAME_ERROR;
+    }
+    
     if(size != FRAME_SIZE) return FRAME_ERROR;
     
     uint16_t validity = (frame[0] << 8) | frame[1];
@@ -38,6 +45,27 @@ FrameType identifyFrame(const uint8_t* frame, size_t size) {
     }
     
     return FRAME_ERROR;
+}
+
+CommandType identifyCommand(const uint8_t* cmd_frame) {
+    uint8_t crc_calc = crc8(cmd_frame, 4);
+    if(crc_calc != cmd_frame[4]) return CMD_ERROR;
+    
+    uint8_t checksum = cmd_frame[0] + cmd_frame[1] + cmd_frame[2] + cmd_frame[3];
+    if(checksum != cmd_frame[5]) return CMD_ERROR;
+    
+    uint8_t cmd_id = cmd_frame[0];
+    
+    switch(cmd_id) {
+        case CMD_ID_LOITER_MODE:     return CMD_LOITER_MODE;
+        case CMD_ID_WAYPOINT_MODE:   return CMD_WAYPOINT_MODE;
+        case CMD_ID_MANUAL_MODE:     return CMD_MANUAL_MODE;
+        case CMD_ID_ADD_WAYPOINT:    return CMD_ADD_WAYPOINT;
+        case CMD_ID_DELETE_WAYPOINT: return CMD_DELETE_WAYPOINT;
+        case CMD_ID_GET_WAYPOINT:    return CMD_GET_WAYPOINT;
+        case CMD_ID_CLEAR_MISSION:   return CMD_CLEAR_MISSION;
+        default: return CMD_ERROR;
+    }
 }
 
 void encodeDownlinkTelem(uint8_t* frame, const DownlinkTelemetry* data) {
@@ -152,6 +180,30 @@ bool decodeUplinkControl(const uint8_t* frame, UplinkControl* data) {
     data->target_pitch = target_pitch / 100.0f;
     data->yaw_rate = yaw_rate / 100.0f;
     data->motor_speed = motor_speed;
+    
+    return true;
+}
+
+void encodeCommand(uint8_t* cmd_frame, const CommandFrame* cmd) {
+    cmd_frame[0] = cmd->cmd_id;
+    cmd_frame[1] = cmd->param1;
+    cmd_frame[2] = cmd->param2;
+    cmd_frame[3] = cmd->param3;
+    cmd_frame[4] = crc8(cmd_frame, 4);
+    cmd_frame[5] = cmd_frame[0] + cmd_frame[1] + cmd_frame[2] + cmd_frame[3];
+}
+
+bool decodeCommand(const uint8_t* cmd_frame, CommandFrame* cmd) {
+    uint8_t crc_calc = crc8(cmd_frame, 4);
+    if(crc_calc != cmd_frame[4]) return false;
+    
+    uint8_t checksum = cmd_frame[0] + cmd_frame[1] + cmd_frame[2] + cmd_frame[3];
+    if(checksum != cmd_frame[5]) return false;
+    
+    cmd->cmd_id = cmd_frame[0];
+    cmd->param1 = cmd_frame[1];
+    cmd->param2 = cmd_frame[2];
+    cmd->param3 = cmd_frame[3];
     
     return true;
 }
