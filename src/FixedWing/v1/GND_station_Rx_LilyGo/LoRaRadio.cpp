@@ -42,9 +42,8 @@ bool LoRaRadio::init() {
     LoRa.setTxPower(config.tx_power);
     LoRa.setCodingRate4(config.coding_rate);
     
-    // Disable AGC - use LNA gain register instead
-    LoRa.writeRegister(0x0C, 0x23);  // RegLna: LNA gain = max, LnaBoostHf = 150%
-    LoRa.writeRegister(0x26, 0x0C);  // RegModemConfig3: AGC off, LowDataRateOptimize auto
+    // Use explicit receive mode to stabilize AGC
+    LoRa.receive();
     
     return true;
 }
