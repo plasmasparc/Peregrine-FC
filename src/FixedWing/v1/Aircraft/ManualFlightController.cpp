@@ -25,10 +25,15 @@ void ManualFlightController::execute(BLDCMotor* motor) {
 }
 
 void ManualFlightController::setRecoveryAttitude() {
-    setTargetPitch(-2.0f);
-    setTargetRoll(7.0f);
-    setTargetYaw(integrated_yaw);
+    ctrl.target_pitch = -2.0f;
+    ctrl.target_roll = 7.0f;
     yaw_rate = 5.0f;
+    
+    updateYaw();
+    
+    setTargetPitch(ctrl.target_pitch);
+    setTargetRoll(ctrl.target_roll);
+    setTargetYaw(integrated_yaw);
 }
 
 void ManualFlightController::updateYaw() {
