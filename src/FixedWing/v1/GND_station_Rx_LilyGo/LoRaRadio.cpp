@@ -43,7 +43,7 @@ bool LoRaRadio::init() {
     LoRa.setCodingRate4(config.coding_rate);
     
     // Use explicit receive mode to stabilize AGC
-    LoRa.receive();
+    //LoRa.receive();
     
     return true;
 }
