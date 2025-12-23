@@ -8,10 +8,14 @@ void FlightController::update() {
     processUplink();
     checkFailsafe();
     executeMode();
-    sendTelemetry();
+    //if(mode_str=="FAILSAFE")
+    //  sendTelemetry();
     
     const char* mode_str = (mode == MODE_MANUAL) ? "MANUAL" : 
                            (mode == MODE_AUTO) ? "AUTO" : "FAILSAFE";
+
+    if(mode_str=="FAILSAFE")
+      sendTelemetry();
     
     Serial.print("Mode: ");
     Serial.print(mode_str);

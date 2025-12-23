@@ -5,6 +5,7 @@
 
 #define DISPLAY_DOWNLINK_ONLY 1
 
+LoRaConfig lora_config;
 LoRaRadio radio;
 DisplayManager display;
 WebTracker tracker;
@@ -25,6 +26,21 @@ void setup() {
         while(1);
     }
     display.showInitMessage("Initializing...");
+    lora_config.rx_pin = LORA_RX_PIN;
+    lora_config.tx_pin = LORA_TX_PIN;
+    lora_config.sck_pin = LORA_SCK_PIN;
+    lora_config.ss_pin = LORA_SS_PIN;
+    lora_config.rst_pin = LORA_RST_PIN;
+    lora_config.dio0_pin = LORA_DIO0_PIN;
+    lora_config.frequency = 433.92E6;
+    lora_config.bandwidth = LORA_BANDWIDTH;
+    lora_config.spreading_factor = LORA_SPREADING_FACTOR;
+    lora_config.sync_word = LORA_SYNC_WORD;
+    lora_config.tx_power = LORA_TX_POWER;
+    lora_config.coding_rate = LORA_CODING_RATE;
+    
+    LoRaRadio radio_init(lora_config);
+    radio = radio_init;
     
     if(!radio.init()) {
         Serial.println("LoRa init failed");
