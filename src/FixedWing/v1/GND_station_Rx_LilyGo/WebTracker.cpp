@@ -6,7 +6,7 @@ WebTracker::WebTracker() : server(80) {
 }
 
 void WebTracker::init() {
-    WiFi.softAP("LoRa_Tracker", "12345678");
+    WiFi.softAP("attila", "attila12");
     
     server.on("/", [this]() { handleRoot(); });
     server.begin();
