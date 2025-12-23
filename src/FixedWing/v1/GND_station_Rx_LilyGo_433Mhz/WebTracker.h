@@ -11,6 +11,8 @@
 struct Position {
     double lat;
     double lon;
+    float roll;
+    float pitch;
     uint32_t timestamp_ms;
 };
 
@@ -18,7 +20,7 @@ class WebTracker {
 public:
     WebTracker();
     void init();
-    void addPosition(double lat, double lon);
+    void addPosition(double lat, double lon, float roll, float pitch);
     void handleClient();
     String getIPAddress();
     

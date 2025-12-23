@@ -97,8 +97,10 @@ bool decodeDownlinkTelem(const uint8_t* frame, DownlinkTelemetry* data) {
     data->pitch = pitch / 10.0f;
     data->yaw = yaw / 10.0f;
     
-    int32_t lat = ((int32_t)frame[10] << 24) | ((int32_t)frame[11] << 16) | ((int32_t)frame[12] << 8) | frame[13];
-    int32_t lon = ((int32_t)frame[14] << 24) | ((int32_t)frame[15] << 16) | ((int32_t)frame[16] << 8) | frame[17];
+    uint32_t lat_raw = ((uint32_t)frame[10] << 24) | ((uint32_t)frame[11] << 16) | ((uint32_t)frame[12] << 8) | frame[13];
+    uint32_t lon_raw = ((uint32_t)frame[14] << 24) | ((uint32_t)frame[15] << 16) | ((uint32_t)frame[16] << 8) | frame[17];
+    int32_t lat = *((int32_t*)&lat_raw);
+    int32_t lon = *((int32_t*)&lon_raw);
     int16_t alt = (frame[18] << 8) | frame[19];
     uint16_t speed = (frame[20] << 8) | frame[21];
     
