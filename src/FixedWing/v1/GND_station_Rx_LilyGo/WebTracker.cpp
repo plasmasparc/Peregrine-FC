@@ -35,7 +35,7 @@ void WebTracker::handleRoot() {
 }
 
 String WebTracker::generateHTML() {
-    String html = "<!DOCTYPE html><html><head><meta charset='UTF-8'><title>Flight Tracker</title>";
+    String html = "<!DOCTYPE html><html><head><meta charset='UTF-8'><meta http-equiv='refresh' content='0.2'><title>Flight Tracker</title>";
     html += "<style>body{margin:0;font-family:monospace;}#map{width:100vw;height:100vh;}</style></head><body>";
     html += "<div id='map'></div><script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>";
     html += "<link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'/><script>";
@@ -76,4 +76,8 @@ String WebTracker::generateHTML() {
     
     html += "</script></body></html>";
     return html;
+}
+
+String WebTracker::getIPAddress() {
+    return WiFi.localIP().toString();
 }

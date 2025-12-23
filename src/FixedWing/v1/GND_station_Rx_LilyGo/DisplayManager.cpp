@@ -20,7 +20,7 @@ void DisplayManager::showInitMessage(const char* message) {
     display.display();
 }
 
-void DisplayManager::showDownlinkTelemetry(const DownlinkTelemetry* telem, uint32_t dl_count, uint32_t ul_count, uint32_t err_count) {
+void DisplayManager::showDownlinkTelemetry(const DownlinkTelemetry* telem, uint32_t dl_count, uint32_t ul_count, uint32_t err_count, const char* ip_addr) {
     display.clearDisplay();
     display.setCursor(0, 0);
     display.print("DL:");
@@ -32,8 +32,8 @@ void DisplayManager::showDownlinkTelemetry(const DownlinkTelemetry* telem, uint3
     display.print("R:");
     display.print(telem->roll, 1);
     display.print(" P:");
-    display.println(telem->pitch, 1);
-    display.print("Y:");
+    display.print(telem->pitch, 1);
+    display.print(" Y:");
     display.println(telem->yaw, 1);
     display.print("Lat:");
     display.println(telem->lat, 7);
@@ -43,10 +43,12 @@ void DisplayManager::showDownlinkTelemetry(const DownlinkTelemetry* telem, uint3
     display.print(telem->alt, 1);
     display.print(" Spd:");
     display.println(telem->speed, 1);
-    display.print("Sats:");
+    display.print("Sat:");
     display.print(telem->satellites);
     display.print(" Fix:");
     display.println(telem->fix);
+    display.print("IP:");
+    display.println(ip_addr);
     display.display();
 }
 

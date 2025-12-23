@@ -20,6 +20,7 @@ public:
     void init();
     void addPosition(double lat, double lon);
     void handleClient();
+    String getIPAddress();
     
 private:
     WebServer server;

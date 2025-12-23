@@ -1,4 +1,3 @@
-// GND_station_Rx_LilyGo.ino
 #include "LoRaRadio.h"
 #include "FrameProtocol.h"
 #include "DisplayManager.h"
@@ -53,7 +52,7 @@ void loop() {
                 tracker.addPosition(last_telem.lat, last_telem.lon);
                 
                 #if DISPLAY_DOWNLINK_ONLY
-                display.showDownlinkTelemetry(&last_telem, downlink_count, uplink_count, error_count);
+                display.showDownlinkTelemetry(&last_telem, downlink_count, uplink_count, error_count, tracker.getIPAddress().c_str());
                 #endif
             } else {
                 error_count++;
