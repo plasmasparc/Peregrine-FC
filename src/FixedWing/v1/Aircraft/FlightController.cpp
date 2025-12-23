@@ -19,7 +19,11 @@ void FlightController::processUplink() {
         
         if(type == FRAME_UPLINK) {
             last_rx_time = millis();
-            mode = MODE_MANUAL;
+            
+            if(mode == MODE_FAILSAFE) {
+                mode = MODE_MANUAL;
+            }
+            
             manual_ctrl.processControl(rx_frame);
         }
     }
