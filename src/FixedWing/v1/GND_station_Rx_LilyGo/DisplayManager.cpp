@@ -35,6 +35,10 @@ void DisplayManager::showDownlinkTelemetry(const DownlinkTelemetry* telem, uint3
     display.println(telem->pitch, 1);
     display.print("Y:");
     display.println(telem->yaw, 1);
+    display.print("Lat:");
+    display.println(telem->lat, 7);
+    display.print("Lon:");
+    display.println(telem->lon, 7);
     display.print("Alt:");
     display.print(telem->alt, 1);
     display.print(" Spd:");
