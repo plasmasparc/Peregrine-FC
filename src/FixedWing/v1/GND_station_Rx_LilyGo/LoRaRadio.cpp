@@ -28,22 +28,23 @@ LoRaRadio::LoRaRadio(const LoRaConfig& cfg) : config(cfg) {
 }
 
 bool LoRaRadio::init() {
-    SPI.begin(config.sck_pin, config.tx_pin, config.rx_pin, config.ss_pin);
+    // Configure SPI pins
+    SPI.begin(config.sck_pin,config.tx_pin,config.rx_pin,config.ss_pin);
     
+    // Set LoRa pins
     LoRa.setPins(config.ss_pin, config.rst_pin, config.dio0_pin);
     
+    // Initialize LoRa radio
     if (!LoRa.begin(config.frequency)) {
         return false;
     }
     
+    // Configure radio parameters
     LoRa.setSignalBandwidth(config.bandwidth);
     LoRa.setSpreadingFactor(config.spreading_factor);
     LoRa.setSyncWord(config.sync_word);
-    LoRa.setTxPower(config.tx_power);
+    LoRa.setTxPower(config.tx_power);//, PA_OUTPUT_PA_BOOST_PIN);
     LoRa.setCodingRate4(config.coding_rate);
-    
-    // Use explicit receive mode to stabilize AGC
-    //LoRa.receive();
     
     return true;
 }
